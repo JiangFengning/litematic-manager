@@ -1,0 +1,162 @@
+name: Render Litematic Previews
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'litematic_files/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+    inputs:
+      render_type:
+        description: '渲染类型'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - 2d
+          - 3d
+          - materials
+
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  setup:
+    name: 设置环境
+    runs-on: ubuntu-latest
+    outputs:
+      files-changed: ${{ steps.check.outputs.files_changed }}
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 检查文件变化
+      id: check
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "files_changed=true" >> $GITHUB_OUTPUT
+        else
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          if echo "$CHANGED_FILES" | grep -q "litematic_files"; then
+            echo "files_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "files_changed=false" >> $GITHUB_OUTPUT
+          fi
+        fi
+
+  render:
+    name: 渲染预览图
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.files-changed == 'true'
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 设置Python环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 缓存预览图
+      uses: actions/cache@v3
+      with:
+        path: previews/
+        key: previews-${{ github.sha }}
+        restore-keys: |
+          previews-
+
+    - name: 渲染2D预览
+      run: |
+        python scripts/render_previews.py --type 2d
+
+    - name: 渲染3D预览
+      run: |
+        python scripts/render_previews.py --type 3d
+
+    - name: 分析材料
+      run: |
+        python scripts/analyze_materials.py
+
+    - name: 生成元数据
+      run: |
+        python scripts/generate_metadata.py
+
+    - name: 生成静态网站
+      run: |
+        python scripts/generate_site.py
+
+    - name: 上传预览图
+      uses: actions/upload-artifact@v3
+      with:
+        name: previews
+        path: previews/
+        retention-days: 7
+
+    - name: 上传静态网站
+      uses: actions/upload-artifact@v3
+      with:
+        name: site
+        path: site/
+        retention-days: 7
+
+  deploy:
+    name: 部署到GitHub Pages
+    runs-on: ubuntu-latest
+    needs: render
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      with:
+        ref: gh-pages
+
+    - name: 下载预览图
+      uses: actions/download-artifact@v3
+      with:
+        name: previews
+        path: previews/
+
+    - name: 下载静态网站
+      uses: actions/download-artifact@v3
+      with:
+        name: site
+        path: ./
+
+    - name: 配置Git
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+
+    - name: 提交更改
+      run: |
+        git add .
+        git diff --staged --quiet || git commit -m "Update previews and site [skip ci]"
+        git push
+
+    - name: 部署到GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

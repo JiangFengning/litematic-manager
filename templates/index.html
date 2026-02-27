@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏗️ Litematic文件管理</h1>
+            <nav>
+                <a href="/" class="active">首页</a>
+                {% for category_name in categories %}
+                <a href="/category/{{ category_name }}.html">{{ category_name }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ metadata.total_files }}</div>
+                <div class="stat-label">文件总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ categories|length }}</div>
+                <div class="stat-label">分类数量</div>
+            </div>
+        </section>
+
+        <section class="categories">
+            <h2>📁 分类浏览</h2>
+            <div class="category-grid">
+                {% for category_name, category_data in categories.items() %}
+                <a href="/category/{{ category_name }}.html" class="category-card">
+                    <div class="category-icon">📦</div>
+                    <div class="category-name">{{ category_name }}</div>
+                    <div class="category-count">{{ category_data.file_count }} 个文件</div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="recent">
+            <h2>🕐 最近更新</h2>
+            <div class="file-grid">
+                {% for file_path, file in files.items() %}
+                {% if loop.index <= 12 %}
+                <a href="/detail/{{ file_path|replace('/', '_') }}.html" class="file-card">
+                    {% if file.previews.2d %}
+                    <img src="/{{ file.previews.2d }}" alt="{{ file.name }}" class="file-preview">
+                    {% else %}
+                    <div class="file-preview-placeholder">📄</div>
+                    {% endif %}
+                    <div class="file-info">
+                        <div class="file-name">{{ file.name }}</div>
+                        <div class="file-meta">
+                            <span class="file-category">{{ file.category }}</span>
+                            <span class="file-size">{{ (file.file_size / 1024)|round(1) }} KB</span>
+                        </div>
+                    </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Litematic文件管理系统 | Powered by GitHub Actions</p>
+        </div>
+    </footer>
+</body>
+</html>

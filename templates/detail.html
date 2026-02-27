@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏗️ Litematic文件管理</h1>
+            <nav>
+                <a href="/">首页</a>
+                {% for category_name in categories %}
+                <a href="/category/{{ category_name }}.html" {% if category_name == current_category %}class="active"{% endif %}>{{ category_name }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="/">首页</a> &gt;
+            <a href="/category/{{ current_category }}.html">{{ current_category }}</a> &gt;
+            <span>{{ file.name }}</span>
+        </div>
+
+        <section class="file-detail">
+            <h1>{{ file.name }}</h1>
+            
+            <div class="file-meta">
+                <div class="meta-item">
+                    <span class="meta-label">分类:</span>
+                    <span class="meta-value">{{ file.category }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">文件大小:</span>
+                    <span class="meta-value">{{ (file.file_size / 1024)|round(1) }} KB</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">游戏版本:</span>
+                    <span class="meta-value">{{ file.minecraft_version }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">创建时间:</span>
+                    <span class="meta-value">{{ file.created_at[:10] }}</span>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h2>📸 预览</h2>
+                <div class="preview-tabs">
+                    <button class="tab-button active" data-tab="2d">2D预览</button>
+                    {% if file.previews.3d %}
+                    <button class="tab-button" data-tab="3d">3D动画</button>
+                    {% endif %}
+                </div>
+                
+                <div class="preview-content">
+                    {% if file.previews.2d %}
+                    <div class="preview-pane active" id="preview-2d">
+                        <img src="/{{ file.previews.2d }}" alt="{{ file.name }} 2D预览" class="preview-image">
+                    </div>
+                    {% endif %}
+                    
+                    {% if file.previews.3d %}
+                    <div class="preview-pane" id="preview-3d">
+                        <img src="/{{ file.previews.3d }}" alt="{{ file.name }} 3D动画" class="preview-image">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="dimensions-section">
+                <h2>📐 尺寸信息</h2>
+                <div class="dimensions-grid">
+                    {% for region in file.regions %}
+                    <div class="dimension-card">
+                        <h3>{{ region.name }}</h3>
+                        <div class="dimension-values">
+                            <div class="dimension-item">
+                                <span class="dimension-label">长:</span>
+                                <span class="dimension-value">{{ region.size.x }}</span>
+                            </div>
+                            <div class="dimension-item">
+                                <span class="dimension-label">宽:</span>
+                                <span class="dimension-value">{{ region.size.y }}</span>
+                            </div>
+                            <div class="dimension-item">
+                                <span class="dimension-label">高:</span>
+                                <span class="dimension-value">{{ region.size.z }}</span>
+                            </div>
+                        </div>
+                        <div class="dimension-volume">
+                            体积: {{ region.volume }} 方块
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if materials %}
+            <div class="materials-section">
+                <h2>🧱 材料统计</h2>
+                <div class="materials-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">总方块数:</span>
+                        <span class="summary-value">{{ materials.total_blocks }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">方块种类:</span>
+                        <span class="summary-value">{{ materials.unique_blocks }}</span>
+                    </div>
+                </div>
+                
+                <div class="materials-list">
+                    {% for block_id, count in materials.blocks.items() %}
+                    <div class="material-item">
+                        <span class="material-name">{{ block_id }}</span>
+                        <span class="material-count">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="download-section">
+                <h2>⬇️ 下载</h2>
+                <a href="/litematic_files/{{ file.file_path }}" class="download-button" download>
+                    下载 {{ file.file_name }}
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Litematic文件管理系统 | Powered by GitHub Actions</p>
+        </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+</body>
+</html>
