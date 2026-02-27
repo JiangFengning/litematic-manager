@@ -20,9 +20,9 @@ except ImportError:
 class SiteGenerator:
     """静态网站生成器"""
     
-    def __init__(self, template_dir: str = "templates",
-                 output_dir: str = "site",
-                 data_dir: str = "data"):
+    def __init__(self, template_dir: str = "docs/templates",
+                 output_dir: str = "docs/site",
+                 data_dir: str = "docs/data"):
         self.template_dir = Path(template_dir)
         self.output_dir = Path(output_dir)
         self.data_dir = Path(data_dir)
@@ -50,7 +50,7 @@ class SiteGenerator:
     
     def _copy_previews(self):
         """复制预览图到输出目录"""
-        previews_dir = Path("previews")
+        previews_dir = Path("docs/previews")
         if previews_dir.exists():
             output_previews = self.output_dir / "previews"
             if output_previews.exists():
@@ -146,11 +146,11 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="生成静态网站")
-    parser.add_argument("--template-dir", default="templates",
+    parser.add_argument("--template-dir", default="docs/templates",
                        help="模板目录")
-    parser.add_argument("--output-dir", default="site",
+    parser.add_argument("--output-dir", default="docs/site",
                        help="输出目录")
-    parser.add_argument("--data-dir", default="data",
+    parser.add_argument("--data-dir", default="docs/data",
                        help="数据目录")
     
     args = parser.parse_args()

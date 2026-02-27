@@ -11,8 +11,9 @@ from typing import Dict, Any, Optional
 import shutil
 from datetime import datetime
 
-# 添加插件路径到Python路径
-plugin_path = Path(__file__).parent.parent / "core"
+# 获取正确的插件路径（父目录的core文件夹）
+current_dir = Path(__file__).parent.parent
+plugin_path = current_dir.parent / "core"
 sys.path.insert(0, str(plugin_path))
 
 try:
@@ -26,11 +27,11 @@ class LocalRenderer:
     """本地渲染器 - 调用插件渲染功能"""
     
     def __init__(self, litematic_dir: str = "litematic_files", 
-                 output_dir: str = "previews",
-                 plugin_dir: str = "."):
+                 output_dir: str = "docs/previews",
+                 plugin_dir: str = str(plugin_path)):
         self.litematic_dir = Path(litematic_dir)
         self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.plugin_dir = Path(plugin_dir)
         
     def find_litematic_files(self, category: str = None):
@@ -96,7 +97,7 @@ class LocalRenderer:
                     output_dir: Path) -> Optional[Path]:
         """渲染2D预览图"""
         try:
-            # 尝试导入插件的2D渲染模块
+            # 导入插件的2D渲染模块
             try:
                 from core.image_render.render2D import Render2D
                 from core.image_render.build_model import World
@@ -106,7 +107,7 @@ class LocalRenderer:
                 world.add_blocks(schematic)
                 
                 # 创建渲染器
-                renderer = Render2D(world, resource_base_path=str(self.plugin_dir / "resource"))
+                renderer = Render2D(world, resource_base_path=str(self.plugin_dir))
                 
                 # 渲染综合视图
                 image = renderer.render_all_views(scale=2)
@@ -121,16 +122,17 @@ class LocalRenderer:
             except ImportError as e:
                 print(f"  ✗ 2D渲染模块未找到: {e}")
                 return None
-                
-        except Exception as e:
-            print(f"  ✗ 2D渲染失败: {e}")
-            return None
+            except Exception as e:
+                print(f"  ✗ 2D渲染失败: {e}")
+                import traceback
+                traceback.print_exc()
+                return None
     
     def _render_3d(self, schematic: Schematic, file_path: Path,
                     output_dir: Path) -> Optional[Path]:
         """渲染3D预览动画"""
         try:
-            # 尝试导入插件的3D渲染模块
+            # 导入插件的3D渲染模块
             try:
                 from core.render_3d.pyvista_renderer import PyVistaRenderer
                 from core.model_3d.model_builder import ModelBuilder
@@ -154,7 +156,7 @@ class LocalRenderer:
                     model_data,
                     surface_data,
                     color_mapper,
-                    resource_dir=str(self.plugin_dir / "resource")
+                    resource_dir=str(self.plugin_dir)
                 )
                 
                 # 渲染动画
@@ -175,15 +177,16 @@ class LocalRenderer:
             except ImportError as e:
                 print(f"  ✗ 3D渲染模块未找到: {e}")
                 return None
-                
-        except Exception as e:
-            print(f"  ✗ 3D渲染失败: {e}")
-            return None
+            except Exception as e:
+                print(f"  ✗ 3D渲染失败: {e}")
+                import traceback
+                traceback.print_exc()
+                return None
     
     def _analyze_materials(self, schematic: Schematic) -> Dict[str, Any]:
         """分析材料"""
         try:
-            # 尝试导入插件的材料分析模块
+            # 导入插件的材料分析模块
             try:
                 from core.material.material import Material
                 
@@ -207,10 +210,11 @@ class LocalRenderer:
             except ImportError as e:
                 print(f"  ✗ 材料分析模块未找到: {e}")
                 return {}
-                
-        except Exception as e:
-            print(f"  ✗ 材料分析失败: {e}")
-            return {}
+            except Exception as e:
+                print(f"  ✗ 材料分析失败: {e}")
+                import traceback
+                traceback.print_exc()
+                return {}
     
     def _extract_metadata(self, schematic: Schematic, file_path: Path) -> Dict[str, Any]:
         """提取元数据"""
@@ -251,8 +255,8 @@ class LocalRenderer:
         
         # 检查预览图
         category = file_path.parent.name
-        preview_2d = Path(f"previews/{category}/{file_path.stem}_2d.png")
-        preview_3d = Path(f"previews/{category}/{file_path.stem}_3d.gif")
+        preview_2d = Path(f"docs/previews/{category}/{file_path.stem}_2d.png")
+        preview_3d = Path(f"docs/previews/{category}/{file_path.stem}_3d.gif")
         
         metadata["previews"] = {
             "2d": str(preview_2d) if preview_2d.exists() else None,
@@ -284,7 +288,7 @@ def main():
     parser.add_argument("--category", help="渲染指定分类")
     parser.add_argument("--litematic-dir", default="litematic_files",
                        help="litematic文件目录")
-    parser.add_argument("--output-dir", default="previews",
+    parser.add_argument("--output-dir", default="docs/previews",
                        help="输出目录")
     parser.add_argument("--no-2d", action="store_true",
                        help="不渲染2D预览")

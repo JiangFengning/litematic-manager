@@ -79,8 +79,8 @@ class AutoUploader:
         for preview_file in preview_files:
             try:
                 # 确定目标路径
-                relative_path = preview_file.relative_to("previews")
-                target_path = self.repo_path / "previews" / relative_path
+                relative_path = preview_file.relative_to("docs/previews")
+                target_path = self.repo_path / "docs" / "previews" / relative_path
                 target_path.parent.mkdir(parents=True, exist_ok=True)
                 
                 # 复制预览图
@@ -94,7 +94,7 @@ class AutoUploader:
     
     def upload_metadata(self, metadata: Dict[str, Any]):
         """上传元数据"""
-        metadata_file = self.repo_path / "data" / "metadata.json"
+        metadata_file = self.repo_path / "docs" / "data" / "metadata.json"
         metadata_file.parent.mkdir(parents=True, exist_ok=True)
         
         with open(metadata_file, 'w', encoding='utf-8') as f:
@@ -102,7 +102,7 @@ class AutoUploader:
         
         print(f"✓ 元数据已更新")
     
-    def upload_site(self, site_dir: str = "site"):
+    def upload_site(self, site_dir: str = "docs/site"):
         """上传静态网站"""
         site_path = Path(site_dir)
         if not site_path.exists():
@@ -111,7 +111,7 @@ class AutoUploader:
         
         # 复制网站文件到仓库根目录
         for item in site_path.iterdir():
-            target_path = self.repo_path / item.name
+            target_path = self.repo_path / "docs" / "site" / item.name
             if target_path.exists():
                 if target_path.is_dir():
                     shutil.rmtree(target_path)
@@ -130,7 +130,7 @@ class AutoUploader:
         """提交并推送"""
         try:
             # 添加所有更改
-            self.git_add(["litematic_files/", "previews/", "data/", "index.html", "detail/", "category/", "assets/"])
+            self.git_add(["litematic_files/", "docs/"])
             
             # 检查是否有更改
             result = subprocess.run(
