@@ -22,11 +22,11 @@
     <main class="container">
         <section class="stats">
             <div class="stat-card">
-                <div class="stat-number">{{ metadata.total_files }}</div>
+                <div class="stat-number">{{ metadata.total_files if metadata else 0 }}</div>
                 <div class="stat-label">文件总数</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">{{ categories|length }}</div>
+                <div class="stat-number">{{ categories|length if categories else 0 }}</div>
                 <div class="stat-label">分类数量</div>
             </div>
         </section>
@@ -34,11 +34,11 @@
         <section class="categories">
             <h2>📁 分类浏览</h2>
             <div class="category-grid">
-                {% for category_name, category_data in categories.items() %}
+                {% for category_name, category_data in (categories or {}).items() %}
                 <a href="/category/{{ category_name }}.html" class="category-card">
                     <div class="category-icon">📦</div>
                     <div class="category-name">{{ category_name }}</div>
-                    <div class="category-count">{{ category_data.file_count }} 个文件</div>
+                    <div class="category-count">{{ category_data.file_count if category_data else 0 }} 个文件</div>
                 </a>
                 {% endfor %}
             </div>
@@ -47,10 +47,10 @@
         <section class="recent">
             <h2>🕐 最近更新</h2>
             <div class="file-grid">
-                {% for file_path, file in files.items() %}
+                {% for file_path, file in (metadata.files if metadata else {}).items() %}
                 {% if loop.index <= 12 %}
                 <a href="/detail/{{ file_path|replace('/', '_') }}.html" class="file-card">
-                    {% if file.previews.2d %}
+                    {% if file.previews and file.previews.2d %}
                     <img src="/{{ file.previews.2d }}" alt="{{ file.name }}" class="file-preview">
                     {% else %}
                     <div class="file-preview-placeholder">📄</div>
@@ -71,7 +71,7 @@
 
     <footer>
         <div class="container">
-            <p>© 2024 Litematic文件管理系统 | Powered by GitHub Actions</p>
+            <p>© 2024 Litematic文件管理系统 | 本地渲染 + GitHub Pages</p>
         </div>
     </footer>
 </body>

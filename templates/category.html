@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏗️ Litematic文件管理</h1>
+            <nav>
+                <a href="/">首页</a>
+                {% for category_name in categories %}
+                <a href="/category/{{ category_name }}.html" {% if category_name == current_category %}class="active"{% endif %}>{{ category_name }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="/">首页</a> &gt;
+            <span>{{ current_category }}</span>
+        </div>
+
+        <section class="category-detail">
+            <h1>{{ current_category }}</h1>
+            
+            <div class="category-stats">
+                <div class="stat-item">
+                    <span class="stat-label">文件数量:</span>
+                    <span class="stat-value">{{ category_data.file_count if category_data else 0 }}</span>
+                </div>
+            </div>
+
+            <div class="file-grid">
+                {% for file in (category_data.files if category_data else []) %}
+                <a href="/detail/{{ file.file_path|replace('/', '_') }}.html" class="file-card">
+                    {% if file.previews and file.previews.2d %}
+                    <img src="/{{ file.previews.2d }}" alt="{{ file.name }}" class="file-preview">
+                    {% else %}
+                    <div class="file-preview-placeholder">📄</div>
+                    {% endif %}
+                    <div class="file-info">
+                        <div class="file-name">{{ file.name }}</div>
+                        <div class="file-meta">
+                            <span class="file-size">{{ (file.file_size / 1024)|round(1) }} KB</span>
+                            <span class="file-volume">{{ file.total_volume if file.total_volume else 0 }} 方块</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Litematic文件管理系统 | 本地渲染 + GitHub Pages</p>
+        </div>
+    </footer>
+</body>
+</html>

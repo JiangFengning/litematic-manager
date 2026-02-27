@@ -1,0 +1,19 @@
+{
+  "github": {
+    "repo_url": "https://github.com/yourusername/litematic-manager.git",
+    "branch": "main"
+  },
+  "render": {
+    "render_2d": true,
+    "render_3d": true,
+    "scale": 2
+  },
+  "upload": {
+    "auto_upload": true,
+    "commit_message_template": "添加文件: {filename}"
+  },
+  "site": {
+    "title": "Litematic文件管理",
+    "description": "我的世界litematic文件管理系统"
+  }
+}

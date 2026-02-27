@@ -10,6 +10,12 @@ from pathlib import Path
 from typing import Dict, Any
 from jinja2 import Environment, FileSystemLoader
 
+try:
+    from jinja2 import Environment, FileSystemLoader
+except ImportError:
+    print("警告: Jinja2未安装，请运行: pip install jinja2")
+    sys.exit(1)
+
 
 class SiteGenerator:
     """静态网站生成器"""
@@ -50,7 +56,7 @@ class SiteGenerator:
             if output_previews.exists():
                 shutil.rmtree(output_previews)
             shutil.copytree(previews_dir, output_previews)
-            print(f"Copied previews to {output_previews}")
+            print(f"✓ 预览图已复制到 {output_previews}")
     
     def generate_index(self):
         """生成首页"""
@@ -67,7 +73,7 @@ class SiteGenerator:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(html)
         
-        print(f"Generated {output_path}")
+        print(f"✓ 已生成 {output_path}")
     
     def generate_category_pages(self):
         """生成分类页面"""
@@ -88,7 +94,7 @@ class SiteGenerator:
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(html)
             
-            print(f"Generated {output_path}")
+            print(f"✓ 已生成 {output_path}")
     
     def generate_detail_pages(self):
         """生成详情页面"""
@@ -111,18 +117,18 @@ class SiteGenerator:
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(html)
             
-            print(f"Generated {output_path}")
+            print(f"✓ 已生成 {output_path}")
     
     def generate_all(self):
         """生成所有页面"""
-        print("Generating static site...")
+        print("\n正在生成静态网站...")
         
         self.generate_index()
         self.generate_category_pages()
         self.generate_detail_pages()
         self._copy_assets()
         
-        print("\nSite generation complete!")
+        print("\n✓ 静态网站生成完成！")
     
     def _copy_assets(self):
         """复制静态资源"""
@@ -132,7 +138,7 @@ class SiteGenerator:
             if output_assets.exists():
                 shutil.rmtree(output_assets)
             shutil.copytree(assets_dir, output_assets)
-            print(f"Copied assets to {output_assets}")
+            print(f"✓ 资源文件已复制到 {output_assets}")
 
 
 def main():

@@ -43,8 +43,8 @@
                     <span class="meta-value">{{ file.minecraft_version }}</span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-label">创建时间:</span>
-                    <span class="meta-value">{{ file.created_at[:10] }}</span>
+                    <span class="meta-label">体积:</span>
+                    <span class="meta-value">{{ file.total_volume if file.total_volume else 0 }} 方块</span>
                 </div>
             </div>
 
@@ -52,19 +52,19 @@
                 <h2>📸 预览</h2>
                 <div class="preview-tabs">
                     <button class="tab-button active" data-tab="2d">2D预览</button>
-                    {% if file.previews.3d %}
+                    {% if file.previews and file.previews.3d %}
                     <button class="tab-button" data-tab="3d">3D动画</button>
                     {% endif %}
                 </div>
                 
                 <div class="preview-content">
-                    {% if file.previews.2d %}
+                    {% if file.previews and file.previews.2d %}
                     <div class="preview-pane active" id="preview-2d">
                         <img src="/{{ file.previews.2d }}" alt="{{ file.name }} 2D预览" class="preview-image">
                     </div>
                     {% endif %}
                     
-                    {% if file.previews.3d %}
+                    {% if file.previews and file.previews.3d %}
                     <div class="preview-pane" id="preview-3d">
                         <img src="/{{ file.previews.3d }}" alt="{{ file.name }} 3D动画" class="preview-image">
                     </div>
@@ -75,7 +75,7 @@
             <div class="dimensions-section">
                 <h2>📐 尺寸信息</h2>
                 <div class="dimensions-grid">
-                    {% for region in file.regions %}
+                    {% for region in (file.regions if file else []) %}
                     <div class="dimension-card">
                         <h3>{{ region.name }}</h3>
                         <div class="dimension-values">
@@ -106,16 +106,16 @@
                 <div class="materials-summary">
                     <div class="summary-item">
                         <span class="summary-label">总方块数:</span>
-                        <span class="summary-value">{{ materials.total_blocks }}</span>
+                        <span class="summary-value">{{ materials.total_blocks if materials.total_blocks else 0 }}</span>
                     </div>
                     <div class="summary-item">
                         <span class="summary-label">方块种类:</span>
-                        <span class="summary-value">{{ materials.unique_blocks }}</span>
+                        <span class="summary-value">{{ materials.unique_blocks if materials.unique_blocks else 0 }}</span>
                     </div>
                 </div>
                 
                 <div class="materials-list">
-                    {% for block_id, count in materials.blocks.items() %}
+                    {% for block_id, count in (materials.blocks if materials else {}).items() %}
                     <div class="material-item">
                         <span class="material-name">{{ block_id }}</span>
                         <span class="material-count">{{ count }}</span>
@@ -136,7 +136,7 @@
 
     <footer>
         <div class="container">
-            <p>© 2024 Litematic文件管理系统 | Powered by GitHub Actions</p>
+            <p>© 2024 Litematic文件管理系统 | 本地渲染 + GitHub Pages</p>
         </div>
     </footer>
 
