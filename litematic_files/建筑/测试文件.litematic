@@ -1,0 +1,27 @@
+{
+  "MinecraftDataVersion": 2975,
+  "Width": 10,
+  "Height": 10,
+  "Length": 10,
+  "Summary": "测试文件",
+  "Regions": [
+    {
+      "Position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "Size": {
+        "x": 10,
+        "y": 10,
+        "z": 10
+      },
+      "BlockStatePalette": {
+        "Id": "minecraft:air"
+      },
+      "Blocks": []
+    }
+  ],
+  "Entities": [],
+  "TileEntities": []
+}
