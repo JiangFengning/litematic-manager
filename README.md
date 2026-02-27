@@ -50,7 +50,7 @@ git push origin main
 
 等待5-10分钟后，访问：
 ```
-https://yourusername.github.io/litematic-manager/
+https://JiangFengning.github.io/litematic-manager/
 ```
 
 ## 项目结构
@@ -75,6 +75,21 @@ litematic-manager/
 - **渲染**: Pillow + PyVista
 - **解析**: litemapy
 - **部署**: GitHub Actions + GitHub Pages
+
+## 当前状态
+
+- ✅ 项目结构已创建
+- ✅ GitHub Actions工作流已配置
+- ✅ 代码已推送到GitHub
+- ✅ 渲染脚本已修复
+- ⏳ 等待配置GitHub Pages
+
+## 下一步
+
+1. 访问 https://github.com/JiangFengning/litematic-manager/settings/pages
+2. 配置GitHub Pages（选择"GitHub Actions"作为Source）
+3. 等待Actions工作流完成
+4. 访问网站验证功能
 
 ## 许可证
 
