@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import List, Dict, Any
 import json
 from tqdm import tqdm
+from PIL import Image, ImageDraw, ImageFont
+import math
 
 try:
     from litemapy import Schematic
-    from PIL import Image
-    import numpy as np
 except ImportError as e:
     print(f"缺少依赖库: {e}")
     print("请运行: pip install -r requirements.txt")
@@ -50,9 +50,6 @@ class LitematicRenderer:
             
             # 创建简单的预览图
             img = Image.new('RGB', (400, 300), color=(240, 240, 240))
-            
-            # 添加文件名
-            from PIL import ImageDraw, ImageFont
             draw = ImageDraw.Draw(img)
             
             try:
@@ -88,8 +85,6 @@ class LitematicRenderer:
             output_path.parent.mkdir(parents=True, exist_ok=True)
             
             # 创建简单的GIF动画
-            from PIL import ImageDraw
-            
             frames = []
             for i in range(10):
                 img = Image.new('RGB', (400, 300), color=(240, 240, 240))
@@ -97,7 +92,6 @@ class LitematicRenderer:
                 
                 # 绘制旋转的方块
                 angle = i * 36
-                import math
                 x_offset = int(50 * math.cos(math.radians(angle)))
                 y_offset = int(50 * math.sin(math.radians(angle)))
                 
